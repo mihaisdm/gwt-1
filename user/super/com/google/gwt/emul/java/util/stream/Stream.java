@@ -44,11 +44,22 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   public static <T> Stream.Builder<T> builder() {
-    return null;//TODO
+    return new Builder<T>() {
+      private List<T> items = new ArrayList<>();
+      @Override
+      public void accept(T t) {
+        items.add(t);
+      }
+
+      @Override
+      public Stream<T> build() {
+        return items.stream();
+      }
+    };
   }
 
   public static <T> Stream<T> concat(Stream<? extends T> a, Stream<? extends T> b) {
-    return null;//TODO
+    return of(a, b).flatMap(stream -> stream);
   }
 
   public static <T> Stream<T> empty() {
@@ -458,7 +469,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Iterator<T> iterator() {
-      return null;//TODO
+      return collect(Collectors.toList()).iterator();
     }
 
     @Override
@@ -601,7 +612,31 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public <R> Stream<R> flatMap(final Function<? super T, ? extends Stream<? extends R>> mapper) {
-      return null;//TODO
+      final Spliterator<? extends Stream<? extends R>> spliteratorOfStreams = map(mapper).spliterator();
+      return new StreamSource<R>(new Spliterators.AbstractSpliterator<R>(Long.MAX_VALUE, 0) {
+        Spliterator<? extends R> next;
+        @Override
+        public boolean tryAdvance(Consumer<? super R> action) {
+          while (advanceToNextSpliterator()) {//look for a new spliterator
+            if (next.tryAdvance(action)) {//if we have one, try to read and use it
+              return true;
+            } else {
+              next = null;//failed, null it out so we can find another
+            }
+          }
+
+          return false;
+        }
+
+        private boolean advanceToNextSpliterator() {
+          while (next == null) {
+            if (!spliteratorOfStreams.tryAdvance(n -> next = n.spliterator())) {
+              return false;
+            }
+          }
+          return true;
+        }
+      });
     }
 
     @Override

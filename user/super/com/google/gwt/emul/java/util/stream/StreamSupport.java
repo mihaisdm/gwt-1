@@ -1,6 +1,7 @@
 package java.util.stream;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public final class StreamSupport {
 
@@ -32,8 +33,8 @@ public final class StreamSupport {
     return new Stream.StreamSource<T>(spliterator);
   }
 
-  public static <T> Stream<T> stream(Supplier<? extends Spliterator<T>> supplier, int characteristics, boolean parallel) {
-    return null;//TODO
+  public static <T> Stream<T> stream(Supplier<? extends Spliterator<T>> supplier, int characteristics, final boolean parallel) {
+    return Stream.of(supplier).flatMap(spliterator -> stream(spliterator, parallel));
   }
 
 }
