@@ -1,5 +1,14 @@
 package java.util.stream;
 
+import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
+import java.util.List;
+import java.util.function.ToDoubleFunction;
+import java.util.function.Supplier;
+import java.util.function.Function;
+import java.util.function.BinaryOperator;
+
+
 public final class Collectors {
   public static <T> Collector<T,?,Double> averagingDouble(ToDoubleFunction<? super T> mapper) {
     return null;

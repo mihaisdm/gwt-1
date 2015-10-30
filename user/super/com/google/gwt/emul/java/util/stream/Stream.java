@@ -3,7 +3,11 @@ package java.util.stream;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.Runnable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +25,7 @@ import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -29,8 +34,16 @@ import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
 public interface Stream<T> extends BaseStream<T, Stream<T>> {
+  static final class ValueConsumer<T> implements Consumer<T> {
+    T value;
 
-  public static static <T> Stream.Builder<T> builder() {
+    @Override
+    public void accept(T value) {
+      this.value = value;
+    }
+  }
+
+  public static <T> Stream.Builder<T> builder() {
     return null;
   }
 
@@ -47,15 +60,15 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   public static <T> Stream<T> iterate(T seed, UnaryOperator<T> f) {
-    Object[] current = new Object[] {seed};
-
-    return new StreamSource<>(
-        () -> Optional.of((T)current[0]),
-        () -> {
-          current[0] = f.apply((T)current[0]);
-          return Optional.of((T)current[0]);
-        }
-    );
+    return StreamSupport.stream(new Spliterators.AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED) {
+      private T next = seed;
+      @Override
+      public boolean tryAdvance(Consumer<? super T> action) {
+        action.accept(next);
+        next = f.apply(next);
+        return true;
+      }
+    });
   }
 
   public static <T> Stream<T> of(T t) {
@@ -156,17 +169,17 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
-      return new IntStream.EmptyStreamSource();
+      return null;//new IntStream.EmptyStreamSource();
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
-      return new LongStream.EmptyStreamSource();
+      return null;//new LongStream.EmptyStreamSource();
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
-      return new DoubleStream.EmptyStreamSource();
+      return null;//new DoubleStream.EmptyStreamSource();
     }
 
     @Override
@@ -176,17 +189,17 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
-      return new IntStream.EmptyStreamSource();
+      return null;//new IntStream.EmptyStreamSource();
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
-      return new LongStream.EmptyStreamSource();
+      return null;//new LongStream.EmptyStreamSource();
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
-      return new DoubleStream.EmptyStreamSource();
+      return null;//new DoubleStream.EmptyStreamSource();
     }
 
     @Override
@@ -221,12 +234,12 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public void forEach(Consumer<? super T> action) {
-
+      //nothing to do
     }
 
     @Override
     public void forEachOrdered(Consumer<? super T> action) {
-
+      //nothing to do
     }
 
     @Override
@@ -345,40 +358,108 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     }
   }
 
-  private static class StreamSource<T> implements Stream<T> {
-    private final Supplier<Optional<T>> peek;
-    private final Supplier<Optional<T>> pop;
+  static final class MappedSpliterator<U, T> extends Spliterators.AbstractSpliterator<T> {
+    private final Function<U, T> map;
+    private final Spliterator<U> original;
 
-    public StreamSource(Supplier<Optional<T>> peek, Supplier<Optional<T>> pop) {
-      this.peek = peek;
-      this.pop = pop;
+    public MappedSpliterator(Function<? super U, ? extends T> map, Spliterator<U> original) {
+      super(original.estimateSize(), original.characteristics());
+      this.map = map;
+      this.original = original;
+    }
+
+    @Override
+    public boolean tryAdvance(final Consumer<? super T> action) {
+      return original.tryAdvance(u -> action.accept(map.apply(u)));
+    }
+  }
+  static final class FilterSpliterator<T> extends Spliterators.AbstractSpliterator<T> {
+    private final Predicate<T> filter;
+    private final Spliterator<T> original;
+
+    public FilterSpliterator(Predicate<? super T> filter, Spliterator<T> original) {
+      super(original.estimateSize(), original.characteristics() & ~Spliterator.SIZED);
+      this.filter = filter;
+      this.original = original;
+    }
+
+    @Override
+    public boolean tryAdvance(final Consumer<? super T> action) {
+      boolean[] found = {false};
+      while (original.tryAdvance(item -> {
+        if (filter.test(item)) {
+          found[0] = true;
+          action.accept(item);
+        }
+      })) {
+        if (found[0]) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  }
+  static final class SkipSpliterator<T> extends Spliterators.AbstractSpliterator<T> {
+    private long skip;
+    private final Spliterator<T> original;
+
+    public SkipSpliterator(long skip, Spliterator<T> original) {
+      super(original.estimateSize() - skip, original.characteristics());
+      this.skip = skip;
+      this.original = original;
+    }
+
+    @Override
+    public boolean tryAdvance(Consumer<? super T> action) {
+      while (skip-- > 0) {
+        original.tryAdvance(ignore -> {});
+      }
+      return original.tryAdvance(action);
+    }
+  }
+  static final class LimitSpliterator<T> extends Spliterators.AbstractSpliterator<T> {
+    private final int limit;
+    private final Spliterator<T> original;
+    private int position = 0;
+
+    public LimitSpliterator(int limit, Spliterator<T> original) {
+      super(original.estimateSize(), original.characteristics());
+      this.limit = limit;
+      this.original = original;
+    }
+
+    @Override
+    public boolean tryAdvance(Consumer<? super T> action) {
+      if (limit <= position++) {
+        return false;
+      }
+      return original.tryAdvance(action);
+    }
+  }
+
+  static class StreamSource<T> implements Stream<T> {
+    private final Spliterator<? super T> spliterator;
+
+    public StreamSource(Spliterator<? super T> spliterator) {
+      this.spliterator = spliterator;
     }
 
     //terminal
     @Override
-    public Spliterator<T> spliterator() {         //TODO size
-      return Spliterators.spliterator(iterator(), 12345, 0);
+    public Spliterator<T> spliterator() {
+      return spliterator;
     }
 
     @Override
     public Iterator<T> iterator() {
-      return new Iterator<T>() {
-        @Override
-        public boolean hasNext() {
-          return peek.get().isPresent();
-        }
-
-        @Override
-        public T next() {
-          return pop.get().get();
-        }
-      };
+      return null;
     }
 
     @Override
     public long count() {
       long count = 0;
-      while (peek.get().isPresent()) {
+      while (spliterator.tryAdvance(a -> {})) {
         count++;
       }
       return count;
@@ -391,11 +472,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public void forEachOrdered(Consumer<? super T> action) {
-      Optional<T> next = pop.get();
-      while (next.isPresent()) {
-        next.ifPresent(action);
-        next = pop.get();
-      }
+      spliterator.forEachRemaining(action);
     }
 
     @Override
@@ -428,17 +505,21 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Optional<T> findFirst() {
-      return pop.get();
+      ValueConsumer<T> holder = new ValueConsumer<T>();
+      if (spliterator.tryAdvance(holder)) {
+        return Optional.of(holder.value);
+      }
+      return Optional.empty();
     }
 
     @Override
     public Optional<T> findAny() {
-      return pop.get();
+      return findFirst();
     }
 
     @Override
     public boolean anyMatch(Predicate<? super T> predicate) {
-      return filter(predicate).findFirst().ifPresent();
+      return filter(predicate).findFirst().isPresent();
     }
 
     @Override
@@ -469,27 +550,30 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Optional<T> reduce(BinaryOperator<T> accumulator) {
-      if (!peek.get().isPresent()) {
+      ValueConsumer<T> consumer = new ValueConsumer<T>();
+      if (!spliterator.tryAdvance(consumer)) {
         return Optional.empty();
       }
-      return reduce(pop.get(), accumulator);
+      return Optional.of(reduce(consumer.value, accumulator));
     }
 
     @Override
-    public <U> U reduce(U identity, BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
-      return null;
+    public <U> U reduce(U identity, final BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
+      final ValueConsumer<U> consumer = new ValueConsumer<T>();
+      spliterator.forEachRemaining(item -> consumer.accept(accumulator.apply(consumer.value, item)));
+      return consumer.value;
     }
     //end terminal
 
     //intermediate
     @Override
     public Stream<T> filter(Predicate<? super T> predicate) {
-      return new StreamSource<T>();
+      return new StreamSource<T>(new FilterSpliterator<T>(predicate, spliterator));
     }
 
     @Override
     public <R> Stream<R> map(Function<? super T, ? extends R> mapper) {
-      return new StreamSource<R>();
+      return new StreamSource<R>(new MappedSpliterator<T, R>(mapper, spliterator));
     }
 
     @Override
@@ -529,32 +613,51 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Stream<T> distinct() {
-      return null;
+      HashSet<T> seen = new HashSet<>();
+      return filter(seen::add);
     }
 
     @Override
     public Stream<T> sorted() {
-      return null;
+      Comparator<T> c = (Comparator) Comparator.naturalOrder()
+      return sorted(c);
     }
 
     @Override
-    public Stream<T> sorted(Comparator<? super T> comparator) {
-      return null;
+    public Stream<T> sorted(final Comparator<? super T> comparator) {
+      return new StreamSource<T>(new Spliterators.AbstractSpliterator<T>(spliterator.estimateSize(), spliterator.characteristics() | Spliterator.SORTED) {
+        Spliterator<T> ordered = null;
+        @Override
+        public boolean tryAdvance(Consumer<? super T> action) {
+          if (ordered == null) {
+            List<T> list = new ArrayList<>();
+            spliterator.forEachRemaining(item -> list.add(item));
+            Collections.sort(list, comparator);
+            ordered = list.spliterator();
+          }
+          return ordered.tryAdvance(action);
+        }
+      });
     }
 
     @Override
-    public Stream<T> peek(Consumer<? super T> action) {
-      return null;
+    public Stream<T> peek(final Consumer<? super T> peek) {
+      return new StreamSource<T>(new Spliterators.AbstractSpliterator<T>(spliterator.estimateSize(), spliterator.characteristics()) {
+        @Override
+        public boolean tryAdvance(Consumer<? super T> innerAction) {
+          return spliterator.tryAdvance(peek.andThen(innerAction));
+        }
+      });
     }
 
     @Override
     public Stream<T> limit(long maxSize) {
-      return null;
+      return new StreamSource<T>(new LimitSpliterator<T>(maxSize, spliterator));
     }
 
     @Override
     public Stream<T> skip(long n) {
-      return null;
+      return new StreamSource<T>(new SkipSpliterator<T>(n, spliterator));
     }
 
     @Override
