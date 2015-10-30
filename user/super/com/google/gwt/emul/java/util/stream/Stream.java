@@ -614,6 +614,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     public <R> Stream<R> flatMap(final Function<? super T, ? extends Stream<? extends R>> mapper) {
       final Spliterator<? extends Stream<? extends R>> spliteratorOfStreams = map(mapper).spliterator();
       return new StreamSource<R>(new Spliterators.AbstractSpliterator<R>(Long.MAX_VALUE, 0) {
+        Stream<? extends R> nextStream;
         Spliterator<? extends R> next;
         @Override
         public boolean tryAdvance(Consumer<? super R> action) {
@@ -621,16 +622,21 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
             if (next.tryAdvance(action)) {//if we have one, try to read and use it
               return true;
             } else {
+              nextStream.close();
+              nextStream = null;
               next = null;//failed, null it out so we can find another
             }
           }
-
           return false;
         }
-
         private boolean advanceToNextSpliterator() {
           while (next == null) {
-            if (!spliteratorOfStreams.tryAdvance(n -> next = n.spliterator())) {
+            if (!spliteratorOfStreams.tryAdvance(n -> {
+              if (n != null) {
+                nextStream = n;
+                next = n.spliterator();
+              }
+            })) {
               return false;
             }
           }
