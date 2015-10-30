@@ -44,11 +44,11 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   public static <T> Stream.Builder<T> builder() {
-    return null;
+    return null;//TODO
   }
 
   public static <T> Stream<T> concat(Stream<? extends T> a, Stream<? extends T> b) {
-    return null;
+    return null;//TODO
   }
 
   public static <T> Stream<T> empty() {
@@ -68,11 +68,11 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
         next = f.apply(next);
         return true;
       }
-    });
+    }, false);
   }
 
   public static <T> Stream<T> of(T t) {
-    return null;
+    return null;//TODO
   }
 
   public static <T> Stream<T> of(T... values) {
@@ -169,17 +169,17 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
-      return null;//new IntStream.EmptyStreamSource();
+      return null;//new IntStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
-      return null;//new LongStream.EmptyStreamSource();
+      return null;//new LongStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
-      return null;//new DoubleStream.EmptyStreamSource();
+      return null;//new DoubleStream.EmptyStreamSource();//TODO
     }
 
     @Override
@@ -189,17 +189,17 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
-      return null;//new IntStream.EmptyStreamSource();
+      return null;//new IntStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
-      return null;//new LongStream.EmptyStreamSource();
+      return null;//new LongStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
-      return null;//new DoubleStream.EmptyStreamSource();
+      return null;//new DoubleStream.EmptyStreamSource();//TODO
     }
 
     @Override
@@ -319,12 +319,17 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Iterator<T> iterator() {
-      return null;
+      return Collections.emptyIterator();
     }
 
     @Override
     public Spliterator<T> spliterator() {
-      return null;
+      return new Spliterators.AbstractSpliterator<T>(0, Spliterator.SIZED) {
+        @Override
+        public boolean tryAdvance(Consumer<? super T> action) {
+          return false;
+        }
+      };
     }
 
     @Override
@@ -359,7 +364,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   static final class MappedSpliterator<U, T> extends Spliterators.AbstractSpliterator<T> {
-    private final Function<U, T> map;
+    private final Function<? super U, ? extends T> map;
     private final Spliterator<U> original;
 
     public MappedSpliterator(Function<? super U, ? extends T> map, Spliterator<U> original) {
@@ -374,7 +379,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     }
   }
   static final class FilterSpliterator<T> extends Spliterators.AbstractSpliterator<T> {
-    private final Predicate<T> filter;
+    private final Predicate<? super T> filter;
     private final Spliterator<T> original;
 
     public FilterSpliterator(Predicate<? super T> filter, Spliterator<T> original) {
@@ -419,11 +424,11 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     }
   }
   static final class LimitSpliterator<T> extends Spliterators.AbstractSpliterator<T> {
-    private final int limit;
+    private final long limit;
     private final Spliterator<T> original;
     private int position = 0;
 
-    public LimitSpliterator(int limit, Spliterator<T> original) {
+    public LimitSpliterator(long limit, Spliterator<T> original) {
       super(original.estimateSize(), original.characteristics());
       this.limit = limit;
       this.original = original;
@@ -439,9 +444,9 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   static class StreamSource<T> implements Stream<T> {
-    private final Spliterator<? super T> spliterator;
+    private final Spliterator<T> spliterator;
 
-    public StreamSource(Spliterator<? super T> spliterator) {
+    public StreamSource(Spliterator<T> spliterator) {
       this.spliterator = spliterator;
     }
 
@@ -453,7 +458,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Iterator<T> iterator() {
-      return null;
+      return null;//TODO
     }
 
     @Override
@@ -487,8 +492,11 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     }
 
     @Override
-    public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator, BiConsumer<R, R> combiner) {
-      return collect(Collector.of(supplier, accumulator, combiner));
+    public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator, final BiConsumer<R, R> combiner) {
+      return collect(Collector.of(supplier, accumulator, (a, b) -> {
+        combiner.accept(a, b);
+        return a;
+      }));
     }
 
     @Override
@@ -559,7 +567,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public <U> U reduce(U identity, final BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
-      final ValueConsumer<U> consumer = new ValueConsumer<T>();
+      final ValueConsumer<U> consumer = new ValueConsumer<U>();
       spliterator.forEachRemaining(item -> consumer.accept(accumulator.apply(consumer.value, item)));
       return consumer.value;
     }
@@ -578,37 +586,37 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
-      return null;
+      return null;//TODO
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
-      return null;
+      return null;//TODO
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
-      return null;
+      return null;//TODO
     }
 
     @Override
-    public <R> Stream<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper) {
-      return null;
+    public <R> Stream<R> flatMap(final Function<? super T, ? extends Stream<? extends R>> mapper) {
+      return null;//TODO
     }
 
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
-      return null;
+      return null;//TODO
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
-      return null;
+      return null;//TODO
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
-      return null;
+      return null;//TODO
     }
 
     @Override
@@ -619,7 +627,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Stream<T> sorted() {
-      Comparator<T> c = (Comparator) Comparator.naturalOrder()
+      Comparator<T> c = (Comparator) Comparator.naturalOrder();
       return sorted(c);
     }
 
@@ -644,8 +652,11 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     public Stream<T> peek(final Consumer<? super T> peek) {
       return new StreamSource<T>(new Spliterators.AbstractSpliterator<T>(spliterator.estimateSize(), spliterator.characteristics()) {
         @Override
-        public boolean tryAdvance(Consumer<? super T> innerAction) {
-          return spliterator.tryAdvance(peek.andThen(innerAction));
+        public boolean tryAdvance(final Consumer<? super T> innerAction) {
+          return spliterator.tryAdvance(item -> {
+            peek.accept(item);
+            innerAction.accept(item);
+          });
         }
       });
     }
@@ -667,7 +678,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Stream<T> sequential() {
-      return null;
+      return null;//TODO
     }
 
     @Override
@@ -677,17 +688,17 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Stream<T> unordered() {
-      return null;
+      return null;//TODO
     }
 
     @Override
     public Stream<T> onClose(Runnable closeHandler) {
-      return null;
+      return null;//TODO
     }
 
     @Override
     public void close() {
-
+      //TODO
     }
   }
 
