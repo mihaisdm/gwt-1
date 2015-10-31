@@ -29,6 +29,13 @@ public class StreamTest extends EmulTestBase {
     }
 
     assertEquals(0, Stream.empty().limit(2).collect(Collectors.toList()).size());
+
+    assertFalse(Stream.empty().findFirst().isPresent());
+    assertFalse(Stream.empty().findAny().isPresent());
+    assertFalse(Stream.empty().max((Comparator)Comparator.naturalOrder()).isPresent());
+    assertFalse(Stream.empty().min((Comparator)Comparator.naturalOrder()).isPresent());
+    assertFalse(Stream.empty().allMatch(item -> true));
+    assertFalse(Stream.empty().anyMatch(item -> true));
   }
 
   public void testStreamOfOne() {
