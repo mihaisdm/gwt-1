@@ -579,6 +579,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public <U> U reduce(U identity, final BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
       final ValueConsumer<U> consumer = new ValueConsumer<U>();
+      consumer.value = identity;
       spliterator.forEachRemaining(item -> consumer.accept(accumulator.apply(consumer.value, item)));
       return consumer.value;
     }

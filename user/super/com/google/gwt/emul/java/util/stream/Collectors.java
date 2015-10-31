@@ -1,8 +1,9 @@
 package java.util.stream;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -21,8 +22,17 @@ public final class Collectors {
 
   //...TODO
   
-  public static <T,C extends Collection<T>> Collector<T,?,C> toCollection(Supplier<C> collectionFactory) {
-    return Collector.of(collectionFactory, Collection::add, Collection::addAll);
+  public static <T,C extends Collection<T>> Collector<T,?,C> toCollection(final Supplier<C> collectionFactory) {
+    return Collector.of(
+        collectionFactory,
+        (collection, item) -> collection.add(item),
+        (c1, c2) -> {
+          C c = collectionFactory.get();
+          c.addAll(c1);
+          c.addAll(c2);
+          return c;
+        }
+    );
   }
 
   //not supported
@@ -39,22 +49,32 @@ public final class Collectors {
 //  }
 
   public static <T> Collector<T,?,List<T>> toList() {
-    return Collector.of(ArrayList::new, List::add, List::addAll);
+    return toCollection(ArrayList::new);
   }
 
   public static <T,K,U> Collector<T,?,Map<K,U>> toMap(final Function<? super T,? extends K> keyMapper, final Function<? super T,? extends U> valueMapper) {
-    return Collector.of(HashMap::new, (map, item) -> map.put(keyMapper.apply(item), valueMapper.apply(item)), HashMap::putAll);
+    return Collector.of(HashMap::new, (map, item) -> map.put(keyMapper.apply(item), valueMapper.apply(item)), (m1, m2) -> {
+      Map<K, U> m = new HashMap<K, U>();
+      m.putAll(m1);
+      m.putAll(m2);
+      return m;
+    });
   }
 
   public static <T,K,U> Collector<T,?,Map<K,U>> toMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction) {
     return toMap(keyMapper, valueMapper);
   }
 
-  public static <T,K,U,M extends Map<K,U>> Collector<T,?,M> toMap(final Function<? super T,? extends K> keyMapper, final Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction, Supplier<M> mapSupplier) {
-    return Collector.of(mapSupplier, (map, item) -> map.put(keyMapper.apply(item), valueMapper.apply(item)), HashMap::putAll);
+  public static <T,K,U,M extends Map<K,U>> Collector<T,?,M> toMap(final Function<? super T,? extends K> keyMapper, final Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction, final Supplier<M> mapSupplier) {
+    return Collector.of(mapSupplier, (map, item) -> map.put(keyMapper.apply(item), valueMapper.apply(item)), (m1, m2) -> {
+      M m = mapSupplier.get();
+      m.putAll(m1);
+      m.putAll(m2);
+      return m;
+    });
   }
 
   public static <T> Collector<T,?,Set<T>> toSet() {
-    return Collector.of(HashSet::new, Set::add, Set::addAll);
+    return toCollection(HashSet::new);
   }
 }
