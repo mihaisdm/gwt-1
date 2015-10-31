@@ -1,5 +1,6 @@
 package java.util.stream;
 
+import java.lang.IllegalStateException;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.Runnable;
@@ -59,7 +60,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   public static <T> Stream<T> concat(Stream<? extends T> a, Stream<? extends T> b) {
-    return of(a, b).flatMap(stream -> stream);
+    return of(a, b).flatMap(Function.identity());
   }
 
   public static <T> Stream<T> empty() {
@@ -168,173 +169,218 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
 
   static class EmptyStreamSource<T> implements Stream<T> {
+    private boolean terminated = false;
+    private void throwIfTerminated() {
+      if (terminated) {
+        throw new IllegalStateException("Stream already terminated, can't be modified or used");
+      }
+    }
+    private void terminate() {
+      //no terminals work if already terminated
+      throwIfTerminated();
+      terminated = true;
+    }
     @Override
     public  Stream<T> filter(Predicate<? super T> predicate) {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public <R>  Stream<R> map(Function<? super T, ? extends R> mapper) {
+      throwIfTerminated();
       return (Stream) this;
     }
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
+      throwIfTerminated();
       return null;//new IntStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
+      throwIfTerminated();
       return null;//new LongStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
+      throwIfTerminated();
       return null;//new DoubleStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public <R> Stream<R> flatMap(Function<? super T, ? extends  Stream<? extends R>> mapper) {
+      throwIfTerminated();
       return (Stream) this;
     }
 
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
+      throwIfTerminated();
       return null;//new IntStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
+      throwIfTerminated();
       return null;//new LongStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
+      throwIfTerminated();
       return null;//new DoubleStream.EmptyStreamSource();//TODO
     }
 
     @Override
     public Stream<T> distinct() {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> sorted() {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> sorted(Comparator<? super T> comparator) {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> peek(Consumer<? super T> action) {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> limit(long maxSize) {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> skip(long n) {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public void forEach(Consumer<? super T> action) {
+      terminate();
       //nothing to do
     }
 
     @Override
     public void forEachOrdered(Consumer<? super T> action) {
+      terminate();
       //nothing to do
     }
 
     @Override
     public Object[] toArray() {
+      terminate();
       return new Object[0];
     }
 
     @Override
     public <A> A[] toArray(IntFunction<A[]> generator) {
+      terminate();
       return generator.apply(0);
     }
 
     @Override
     public T reduce(T identity, BinaryOperator<T> accumulator) {
+      terminate();
       return identity;
     }
 
     @Override
     public Optional<T> reduce(BinaryOperator<T> accumulator) {
+      terminate();
       return Optional.empty();
     }
 
     @Override
     public <U> U reduce(U identity, BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
+      terminate();
       return identity;
     }
 
     @Override
     public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator, BiConsumer<R, R> combiner) {
+      terminate();
       return supplier.get();
     }
 
     @Override
     public <R, A> R collect(Collector<? super T, A, R> collector) {
+      terminate();
       return collector.finisher().apply(collector.supplier().get());
     }
 
     @Override
     public Optional<T> min(Comparator<? super T> comparator) {
+      terminate();
       return Optional.empty();
     }
 
     @Override
     public Optional<T> max(Comparator<? super T> comparator) {
+      terminate();
       return Optional.empty();
     }
 
     @Override
     public long count() {
+      terminate();
       return 0;
     }
 
     @Override
     public boolean anyMatch(Predicate<? super T> predicate) {
+      terminate();
       return false;
     }
 
     @Override
     public boolean allMatch(Predicate<? super T> predicate) {
+      terminate();
       return false;
     }
 
     @Override
     public boolean noneMatch(Predicate<? super T> predicate) {
+      terminate();
       return true;
     }
 
     @Override
     public Optional<T> findFirst() {
+      terminate();
       return Optional.empty();
     }
 
     @Override
     public Optional<T> findAny() {
+      terminate();
       return Optional.empty();
     }
 
     @Override
     public Iterator<T> iterator() {
+      terminate();
       return Collections.emptyIterator();
     }
 
     @Override
     public Spliterator<T> spliterator() {
+      terminate();
       return new Spliterators.AbstractSpliterator<T>(0, Spliterator.SIZED) {
         @Override
         public boolean tryAdvance(Consumer<? super T> action) {
@@ -345,32 +391,37 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public boolean isParallel() {
+      throwIfTerminated();
       return false;
     }
 
     @Override
     public Stream<T> sequential() {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> parallel() {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> unordered() {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public Stream<T> onClose(Runnable closeHandler) {
+      throwIfTerminated();
       return this;
     }
 
     @Override
     public void close() {
-
+      //TODO?
     }
   }
 
@@ -456,14 +507,34 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
   static class StreamSource<T> implements Stream<T> {
     private final Spliterator<T> spliterator;
+    private final StreamSource<?> prev;
+    private boolean terminated = false;
 
-    public StreamSource(Spliterator<T> spliterator) {
+
+    public StreamSource(StreamSource<?> prev, Spliterator<T> spliterator) {
+      this.prev = prev;
       this.spliterator = spliterator;
+    }
+
+    private void throwIfTerminated() {
+      if (terminated) {
+        throw new IllegalStateException("Stream already terminated, can't be modified or used");
+      }
+    }
+    //note that not all terminals directly call this, but they must use it indirectly
+    private void terminate() {
+      //no terminals work if already terminated
+      throwIfTerminated();
+      terminated = true;
+      if (prev != null) {
+        prev.terminate();
+      }
     }
 
     //terminal
     @Override
     public Spliterator<T> spliterator() {
+      terminate();
       return spliterator;
     }
 
@@ -474,6 +545,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public long count() {
+      terminate();
       long count = 0;
       while (spliterator.tryAdvance(a -> {})) {
         count++;
@@ -488,6 +560,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public void forEachOrdered(Consumer<? super T> action) {
+      terminate();
       spliterator.forEachRemaining(action);
     }
 
@@ -524,6 +597,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Optional<T> findFirst() {
+      terminate();
       ValueConsumer<T> holder = new ValueConsumer<T>();
       if (spliterator.tryAdvance(holder)) {
         return Optional.of(holder.value);
@@ -561,7 +635,6 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
       return min((o1, o2) -> -comparator.compare(o1, o2));
     }
 
-
     @Override
     public T reduce(T identity, BinaryOperator<T> accumulator) {
       return this.<T>reduce(identity, accumulator, accumulator);
@@ -571,6 +644,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     public Optional<T> reduce(BinaryOperator<T> accumulator) {
       ValueConsumer<T> consumer = new ValueConsumer<T>();
       if (!spliterator.tryAdvance(consumer)) {
+        terminate();
         return Optional.empty();
       }
       return Optional.of(reduce(consumer.value, accumulator));
@@ -578,6 +652,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public <U> U reduce(U identity, final BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
+      terminate();
       final ValueConsumer<U> consumer = new ValueConsumer<U>();
       consumer.value = identity;
       spliterator.forEachRemaining(item -> consumer.accept(accumulator.apply(consumer.value, item)));
@@ -588,33 +663,39 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     //intermediate
     @Override
     public Stream<T> filter(Predicate<? super T> predicate) {
-      return new StreamSource<T>(new FilterSpliterator<T>(predicate, spliterator));
+      throwIfTerminated();
+      return new StreamSource<T>(this, new FilterSpliterator<T>(predicate, spliterator));
     }
 
     @Override
     public <R> Stream<R> map(Function<? super T, ? extends R> mapper) {
-      return new StreamSource<R>(new MappedSpliterator<T, R>(mapper, spliterator));
+      throwIfTerminated();
+      return new StreamSource<R>(this, new MappedSpliterator<T, R>(mapper, spliterator));
     }
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public <R> Stream<R> flatMap(final Function<? super T, ? extends Stream<? extends R>> mapper) {
+      throwIfTerminated();
       final Spliterator<? extends Stream<? extends R>> spliteratorOfStreams = map(mapper).spliterator();
-      return new StreamSource<R>(new Spliterators.AbstractSpliterator<R>(Long.MAX_VALUE, 0) {
+      return new StreamSource<R>(this, new Spliterators.AbstractSpliterator<R>(Long.MAX_VALUE, 0) {
         Stream<? extends R> nextStream;
         Spliterator<? extends R> next;
         @Override
@@ -648,34 +729,40 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public Stream<T> distinct() {
+      throwIfTerminated();
       HashSet<T> seen = new HashSet<>();
       return filter(seen::add);
     }
 
     @Override
     public Stream<T> sorted() {
+      throwIfTerminated();
       Comparator<T> c = (Comparator) Comparator.naturalOrder();
       return sorted(c);
     }
 
     @Override
     public Stream<T> sorted(final Comparator<? super T> comparator) {
-      return new StreamSource<T>(new Spliterators.AbstractSpliterator<T>(spliterator.estimateSize(), spliterator.characteristics() | Spliterator.SORTED) {
+      throwIfTerminated();
+      return new StreamSource<T>(this, new Spliterators.AbstractSpliterator<T>(spliterator.estimateSize(), spliterator.characteristics() | Spliterator.SORTED) {
         Spliterator<T> ordered = null;
         @Override
         public boolean tryAdvance(Consumer<? super T> action) {
@@ -692,7 +779,8 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Stream<T> peek(final Consumer<? super T> peek) {
-      return new StreamSource<T>(new Spliterators.AbstractSpliterator<T>(spliterator.estimateSize(), spliterator.characteristics()) {
+      throwIfTerminated();
+      return new StreamSource<T>(this, new Spliterators.AbstractSpliterator<T>(spliterator.estimateSize(), spliterator.characteristics()) {
         @Override
         public boolean tryAdvance(final Consumer<? super T> innerAction) {
           return spliterator.tryAdvance(item -> {
@@ -705,36 +793,43 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Stream<T> limit(long maxSize) {
-      return new StreamSource<T>(new LimitSpliterator<T>(maxSize, spliterator));
+      throwIfTerminated();
+      return new StreamSource<T>(this, new LimitSpliterator<T>(maxSize, spliterator));
     }
 
     @Override
     public Stream<T> skip(long n) {
-      return new StreamSource<T>(new SkipSpliterator<T>(n, spliterator));
+      throwIfTerminated();
+      return new StreamSource<T>(this, new SkipSpliterator<T>(n, spliterator));
     }
 
     @Override
     public boolean isParallel() {
+      throwIfTerminated();
       return false;
     }
 
     @Override
     public Stream<T> sequential() {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public Stream<T> parallel() {
+      throwIfTerminated();
       return this;//do nothing, no such thing as gwt+parallel
     }
 
     @Override
     public Stream<T> unordered() {
+      throwIfTerminated();
       return null;//TODO
     }
 
     @Override
     public Stream<T> onClose(Runnable closeHandler) {
+      throwIfTerminated();
       return null;//TODO
     }
 
