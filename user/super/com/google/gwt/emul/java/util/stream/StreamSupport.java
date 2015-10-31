@@ -31,7 +31,7 @@ public final class StreamSupport {
   }
 
   public static <T> Stream<T> stream(Spliterator<T> spliterator, boolean parallel) {
-    return new Stream.StreamSource<T>(spliterator);
+    return new Stream.StreamSource<T>(null, spliterator);
   }
 
   public static <T> Stream<T> stream(Supplier<? extends Spliterator<T>> supplier, int characteristics, final boolean parallel) {
