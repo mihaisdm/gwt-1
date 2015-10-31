@@ -49,12 +49,20 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
       private List<T> items = new ArrayList<>();
       @Override
       public void accept(T t) {
+        if (items == null) {
+          throw new IllegalStateException("Builder already built");
+        }
         items.add(t);
       }
 
       @Override
       public Stream<T> build() {
-        return items.stream();
+        if (items == null) {
+          throw new IllegalStateException("Builder already built");
+        }
+        Stream<T> stream = items.stream();
+        items = null;
+        return stream;
       }
     };
   }
@@ -84,15 +92,15 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   public static <T> Stream<T> of(T t) {
-    return null;//TODO
+    return Collections.singleton(t).stream();
   }
 
   public static <T> Stream<T> of(T... values) {
     return StreamSupport.stream(Spliterators.spliterator(values, Spliterator.ORDERED), false);
   }
 
-  public interface Builder<T> {
-
+  public interface Builder<T> extends Consumer<T> {
+    @Override
     void accept(T t);
 
     default Stream.Builder<T> add(T t) {
