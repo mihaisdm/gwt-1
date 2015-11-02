@@ -72,7 +72,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   }
 
   public static <T> Stream<T> empty() {
-    return new EmptyStreamSource<>();
+    return new EmptyStreamSource<T>(null);
   }
 
   public static <T> Stream<T> generate(Supplier<T> s) {
@@ -176,18 +176,11 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   <A> A[] toArray(IntFunction<A[]> generator);
 
 
-  static class EmptyStreamSource<T> implements Stream<T> {
-    private boolean terminated = false;
-    private void throwIfTerminated() {
-      if (terminated) {
-        throw new IllegalStateException("Stream already terminated, can't be modified or used");
-      }
+  static class EmptyStreamSource<T> extends TerminatableStream implements Stream<T> {
+    public EmptyStreamSource(TerminatableStream previous) {
+      super(previous);
     }
-    private void terminate() {
-      //no terminals work if already terminated
-      throwIfTerminated();
-      terminated = true;
-    }
+
     @Override
     public  Stream<T> filter(Predicate<? super T> predicate) {
       throwIfTerminated();
@@ -203,7 +196,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
       throwIfTerminated();
-      return null;//new IntStream.EmptyStreamSource();//TODO
+      return new IntStream.EmptyIntStreamSource(this);
     }
 
     @Override
@@ -514,30 +507,13 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     }
   }
 
-  static class StreamSource<T> implements Stream<T> {
+  static class StreamSource<T> extends TerminatableStream implements Stream<T> {
     private final Spliterator<T> spliterator;
-    private final StreamSource<?> prev;
-    private boolean terminated = false;
 
 
-    public StreamSource(StreamSource<?> prev, Spliterator<T> spliterator) {
-      this.prev = prev;
+    public StreamSource(TerminatableStream prev, Spliterator<T> spliterator) {
+      super(prev);
       this.spliterator = spliterator;
-    }
-
-    private void throwIfTerminated() {
-      if (terminated) {
-        throw new IllegalStateException("Stream already terminated, can't be modified or used");
-      }
-    }
-    //note that not all terminals directly call this, but they must use it indirectly
-    private void terminate() {
-      //no terminals work if already terminated
-      throwIfTerminated();
-      terminated = true;
-      if (prev != null) {
-        prev.terminate();
-      }
     }
 
     //terminal
