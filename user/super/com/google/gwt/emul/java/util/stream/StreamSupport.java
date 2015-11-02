@@ -11,7 +11,7 @@ public final class StreamSupport {
   }
 
   public static DoubleStream doubleStream(Supplier<? extends Spliterator.OfDouble> supplier, int characteristics, boolean parallel) {
-    return Stream.generate(supplier).flatMap(doubleSpliterator -> stream(doubleSpliterator, parallel));
+    return Stream.generate(supplier).flatMapToDouble(doubleSpliterator -> doubleStream(doubleSpliterator, parallel));
   }
 
   public static IntStream intStream(Spliterator.OfInt spliterator, boolean parallel) {
@@ -19,7 +19,7 @@ public final class StreamSupport {
   }
 
   public static IntStream intStream(Supplier<? extends Spliterator.OfInt> supplier, int characteristics, boolean parallel) {
-    return Stream.generate(supplier).flatMap(intSpliterator -> stream(intSpliterator, parallel));
+    return Stream.generate(supplier).flatMapToInt(intSpliterator -> intStream(intSpliterator, parallel));
   }
 
   public static LongStream longStream(Spliterator.OfLong spliterator, boolean parallel) {
@@ -27,7 +27,7 @@ public final class StreamSupport {
   }
 
   public static LongStream longStream(Supplier<? extends Spliterator.OfLong> supplier, int characteristics, final boolean parallel) {
-    return Stream.generate(supplier).flatMap(longSpliterator -> stream(longSpliterator, parallel));
+    return Stream.generate(supplier).flatMapToLong(longSpliterator -> longStream(longSpliterator, parallel));
   }
 
   public static <T> Stream<T> stream(Spliterator<T> spliterator, boolean parallel) {
