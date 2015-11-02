@@ -452,6 +452,8 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     private final Predicate<? super T> filter;
     private final Spliterator<T> original;
 
+    private boolean found;
+
     public FilterSpliterator(Predicate<? super T> filter, Spliterator<T> original) {
       super(original.estimateSize(), original.characteristics() & ~Spliterator.SIZED);
       this.filter = filter;
@@ -460,19 +462,17 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public boolean tryAdvance(final Consumer<? super T> action) {
-      boolean[] found = {false};
-      while (original.tryAdvance(item -> {
+      found = false;
+      while (!found && original.tryAdvance(item -> {
         if (filter.test(item)) {
-          found[0] = true;
+          found = true;
           action.accept(item);
         }
       })) {
-        if (found[0]) {
-          return true;
-        }
+        //do nothing, work is done in tryAdvance
       }
 
-      return false;
+      return found;
     }
   }
   static final class SkipSpliterator<T> extends Spliterators.AbstractSpliterator<T> {
@@ -487,7 +487,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public boolean tryAdvance(Consumer<? super T> action) {
-      while (skip-- > 0) {
+      while (--skip >= 0) {
         original.tryAdvance(ignore -> {});
       }
       return original.tryAdvance(action);
@@ -506,9 +506,10 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public boolean tryAdvance(Consumer<? super T> action) {
-      if (limit <= position++) {
+      if (limit <= position) {
         return false;
       }
+      position++;
       return original.tryAdvance(action);
     }
   }
@@ -777,7 +778,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
           if (ordered == null) {
             List<T> list = new ArrayList<>();
             spliterator.forEachRemaining(item -> list.add(item));
-            Collections.sort(list, comparator);
+            list.sort(comparator);
             ordered = list.spliterator();
           }
           return ordered.tryAdvance(action);
