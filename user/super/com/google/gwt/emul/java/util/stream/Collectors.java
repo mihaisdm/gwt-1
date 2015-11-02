@@ -1,6 +1,7 @@
 package java.util.stream;
 
 import java.lang.CharSequence;
+import java.lang.IllegalStateException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -163,25 +165,31 @@ public final class Collectors {
   }
 
   public static <T,K,U> Collector<T,?,Map<K,U>> toMap(final Function<? super T,? extends K> keyMapper, final Function<? super T,? extends U> valueMapper) {
-    return Collector.of(HashMap::new, (map, item) -> map.put(keyMapper.apply(item), valueMapper.apply(item)), (m1, m2) -> {
-      Map<K, U> m = new HashMap<K, U>();
-      m.putAll(m1);
-      m.putAll(m2);
-      return m;
-    });
+    return toMap(keyMapper, valueMapper, (m1, m2) -> { throw new IllegalStateException("Can't assign multiple values to the same key"); });
   }
 
   public static <T,K,U> Collector<T,?,Map<K,U>> toMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction) {
-    return toMap(keyMapper, valueMapper);
+    return toMap(keyMapper, valueMapper, mergeFunction, HashMap::new);
   }
 
-  public static <T,K,U,M extends Map<K,U>> Collector<T,?,M> toMap(final Function<? super T,? extends K> keyMapper, final Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction, final Supplier<M> mapSupplier) {
-    return Collector.of(mapSupplier, (map, item) -> map.put(keyMapper.apply(item), valueMapper.apply(item)), (m1, m2) -> {
-      M m = mapSupplier.get();
-      m.putAll(m1);
-      m.putAll(m2);
-      return m;
-    });
+  public static <T,K,U,M extends Map<K,U>> Collector<T,?,M> toMap(final Function<? super T,? extends K> keyMapper, final Function<? super T,? extends U> valueMapper, final BinaryOperator<U> mergeFunction, final Supplier<M> mapSupplier) {
+    return Collector.of(
+        mapSupplier,
+        (map, item) -> {
+          K key = keyMapper.apply(item);
+          U newValue = valueMapper.apply(item);
+          if (map.containsKey(key)) {
+            map.put(key, mergeFunction.apply(map.get(key), newValue));
+          }
+          map.put(key, newValue);
+        },
+        (m1, m2) -> {
+          M m = mapSupplier.get();
+          m.putAll(m1);
+          m.putAll(m2);
+          return m;
+        }
+    );
   }
 
   public static <T> Collector<T,?,Set<T>> toSet() {
