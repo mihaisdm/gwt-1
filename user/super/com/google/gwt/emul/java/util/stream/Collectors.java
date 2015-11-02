@@ -38,7 +38,13 @@ public final class Collectors {
   }
 
   public static <T,A,R,RR> Collector<T,A,RR> collectingAndThen(Collector<T,A,R> downstream, Function<R,RR> finisher) {
-    return null;//TODO
+    return Collector.of(
+        downstream.supplier(),
+        downstream.accumulator(),
+        downstream.combiner(),
+        downstream.finisher().andThen(finisher),
+        downstream.characteristics().toArray(new Collector.Characteristics[downstream.characteristics().size()])
+    );
   }
 
   public static <T> Collector<T,?,Long> counting() {
@@ -114,27 +120,72 @@ public final class Collectors {
   }
 
   public static <T> Collector<T,?,DoubleSummaryStatistics> summarizingDouble(ToDoubleFunction<? super T> mapper) {
-    return null;//TODO
+    return Collector.<T, DoubleSummaryStatistics>of(
+        DoubleSummaryStatistics::new,
+        (stats, item) -> stats.accept(mapper.applyAsDouble(item)),
+        (t, u) -> {
+          t.combine(u);
+          return t;
+        }
+    );
   }
 
   public static <T> Collector<T,?,IntSummaryStatistics> summarizingInt(ToIntFunction<? super T> mapper) {
-    return null;//TODO
+    return Collector.<T, IntSummaryStatistics>of(
+        IntSummaryStatistics::new,
+        (stats, item) -> stats.accept(mapper.applyAsInt(item)),
+        (t, u) -> {
+          t.combine(u);
+          return t;
+        }
+    );
   }
 
   public static <T> Collector<T,?,LongSummaryStatistics> summarizingLong(ToLongFunction<? super T> mapper) {
-    return null;//TODO
+    return Collector.<T, LongSummaryStatistics>of(
+        LongSummaryStatistics::new,
+        (stats, item) -> stats.accept(mapper.applyAsLong(item)),
+        (t, u) -> {
+          t.combine(u);
+          return t;
+        }
+    );
   }
 
-  public static <T> Collector<T,?,Double> summingDouble(ToDoubleFunction<? super T> mapper) {
-    return null;//TODO
+  public static <T> Collector<T,?,Double> summingDouble(final ToDoubleFunction<? super T> mapper) {
+    return Collector.<T, DoubleSummaryStatistics, Double>of(
+        DoubleSummaryStatistics::new,
+        (stats, item) -> stats.accept(mapper.applyAsDouble(item)),
+        (t, u) -> {
+          t.combine(u);
+          return t;
+        },
+        DoubleSummaryStatistics::getSum//this is a dumb way to implement this, but its quick and easy to get right the first time
+    );
   }
 
   public static <T> Collector<T,?,Integer> summingInt(ToIntFunction<? super T> mapper) {
-    return null;//TODO
+    return Collector.<T, IntSummaryStatistics, Integer>of(
+        IntSummaryStatistics::new,
+        (stats, item) -> stats.accept(mapper.applyAsInt(item)),
+        (t, u) -> {
+          t.combine(u);
+          return t;
+        },
+        stats -> (int) stats.getSum()//this is a dumb way to implement this, but its quick and easy to get right the first time
+    );
   }
 
   public static <T> Collector<T,?,Long> summingLong(ToLongFunction<? super T> mapper) {
-    return null;//TODO
+    return Collector.<T, LongSummaryStatistics, Long>of(
+        LongSummaryStatistics::new,
+        (stats, item) -> stats.accept(mapper.applyAsLong(item)),
+        (t, u) -> {
+          t.combine(u);
+          return t;
+        },
+         LongSummaryStatistics::getSum//this is a dumb way to implement this, but its quick and easy to get right the first time
+    );
   }
 
   public static <T,C extends Collection<T>> Collector<T,?,C> toCollection(final Supplier<C> collectionFactory) {
