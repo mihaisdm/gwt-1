@@ -641,7 +641,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Optional<T> max(final Comparator<? super T> comparator) {
-      return min((o1, o2) -> -comparator.compare(o1, o2));
+      return min(comparator.reversed());
     }
 
     @Override
