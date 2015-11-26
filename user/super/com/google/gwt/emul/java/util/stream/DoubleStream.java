@@ -16,8 +16,19 @@ import java.util.function.DoubleToLongFunction;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.ObjDoubleConsumer;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public interface DoubleStream extends BaseStream<Double,DoubleStream> {
+
+  static final class ValueConsumer implements DoubleConsumer {
+    double value;
+
+    @Override
+    public void accept(double value) {
+      this.value = value;
+    }
+  }
 
   static DoubleStream.Builder builder() {
     return null;//TODO

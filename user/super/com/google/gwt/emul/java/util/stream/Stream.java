@@ -19,8 +19,11 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
+import java.util.function.LongConsumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
@@ -426,11 +429,11 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     }
   }
 
-  static final class MappedSpliterator<U, T> extends Spliterators.AbstractSpliterator<T> {
+  static final class MapToObjSpliterator<U, T> extends Spliterators.AbstractSpliterator<T> {
     private final Function<? super U, ? extends T> map;
     private final Spliterator<U> original;
 
-    public MappedSpliterator(Function<? super U, ? extends T> map, Spliterator<U> original) {
+    public MapToObjSpliterator(Function<? super U, ? extends T> map, Spliterator<U> original) {
       super(original.estimateSize(), original.characteristics());
       this.map = map;
       this.original = original;
@@ -439,6 +442,51 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public boolean tryAdvance(final Consumer<? super T> action) {
       return original.tryAdvance(u -> action.accept(map.apply(u)));
+    }
+  }
+  static final class MapToIntSpliterator<T> extends Spliterators.AbstractIntSpliterator {
+    private final ToIntFunction<? super T> map;
+    private final Spliterator<T> original;
+
+    public MapToIntSpliterator(ToIntFunction<? super T> map, Spliterator<T> original) {
+      super(original.estimateSize(), original.characteristics());
+      this.map = map;
+      this.original = original;
+    }
+
+    @Override
+    public boolean tryAdvance(final IntConsumer action) {
+      return original.tryAdvance(u -> action.accept(map.applyAsInt(u)));
+    }
+  }
+  static final class MapToLongSpliterator<T> extends Spliterators.AbstractLongSpliterator {
+    private final ToLongFunction<? super T> map;
+    private final Spliterator<T> original;
+
+    public MapToLongSpliterator(ToLongFunction<? super T> map, Spliterator<T> original) {
+      super(original.estimateSize(), original.characteristics());
+      this.map = map;
+      this.original = original;
+    }
+
+    @Override
+    public boolean tryAdvance(final LongConsumer action) {
+      return original.tryAdvance(u -> action.accept(map.applyAsLong(u)));
+    }
+  }
+  static final class MapToDoubleSpliterator<T> extends Spliterators.AbstractDoubleSpliterator {
+    private final ToDoubleFunction<? super T> map;
+    private final Spliterator<T> original;
+
+    public MapToDoubleSpliterator(ToDoubleFunction<? super T> map, Spliterator<T> original) {
+      super(original.estimateSize(), original.characteristics());
+      this.map = map;
+      this.original = original;
+    }
+
+    @Override
+    public boolean tryAdvance(final DoubleConsumer action) {
+      return original.tryAdvance(u -> action.accept(map.applyAsDouble(u)));
     }
   }
   static final class FilterSpliterator<T> extends Spliterators.AbstractSpliterator<T> {
@@ -510,7 +558,6 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   static class StreamSource<T> extends TerminatableStream implements Stream<T> {
     private final Spliterator<T> spliterator;
 
-
     public StreamSource(TerminatableStream prev, Spliterator<T> spliterator) {
       super(prev);
       this.spliterator = spliterator;
@@ -525,7 +572,8 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 
     @Override
     public Iterator<T> iterator() {
-      return collect(Collectors.toList()).iterator();
+      terminate();
+      return Spliterators.iterator(spliterator);
     }
 
     @Override
@@ -655,25 +703,25 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public <R> Stream<R> map(Function<? super T, ? extends R> mapper) {
       throwIfTerminated();
-      return new StreamSource<R>(this, new MappedSpliterator<T, R>(mapper, spliterator));
+      return new StreamSource<R>(this, new MapToObjSpliterator<T, R>(mapper, spliterator));
     }
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
       throwIfTerminated();
-      return null;//TODO
+      return StreamSupport.intStream(new MapToIntSpliterator<T>(mapper, spliterator), false);
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
       throwIfTerminated();
-      return null;//TODO
+      return StreamSupport.longStream(new MapToLongSpliterator<T>(mapper, spliterator), false);
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
       throwIfTerminated();
-      return null;//TODO
+      return StreamSupport.doubleStream(new MapToDoubleSpliterator<T>(mapper, spliterator), false);
     }
 
     @Override
@@ -797,7 +845,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public Stream<T> sequential() {
       throwIfTerminated();
-      return null;//TODO
+      return this;
     }
 
     @Override
@@ -809,7 +857,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public Stream<T> unordered() {
       throwIfTerminated();
-      return null;//TODO
+      return this;
     }
 
     @Override

@@ -19,9 +19,19 @@ import java.util.function.LongUnaryOperator;
 import java.util.function.ObjLongConsumer;
 import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public interface LongStream extends BaseStream<Long,LongStream> {
+
+  static final class ValueConsumer implements LongConsumer {
+    long value;
+
+    @Override
+    public void accept(long value) {
+      this.value = value;
+    }
+  }
 
   static LongStream.Builder builder() {
     return null;//TODO
