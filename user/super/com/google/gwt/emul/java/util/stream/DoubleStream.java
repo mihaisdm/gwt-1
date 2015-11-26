@@ -25,10 +25,6 @@ import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 import java.util.function.ObjDoubleConsumer;
 import java.util.function.Supplier;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public interface DoubleStream extends BaseStream<Double,DoubleStream> {
 
@@ -732,7 +728,8 @@ public interface DoubleStream extends BaseStream<Double,DoubleStream> {
     @Override
     public DoubleStream flatMap(DoubleFunction<? extends DoubleStream> mapper) {
       throwIfTerminated();
-      final Spliterator<? extends DoubleStream> spliteratorOfStreams = mapToObj(mapper).spliterator();
+      throwIfTerminated();
+      final Spliterator<? extends DoubleStream> spliteratorOfStreams = new MapToObjSpliterator<DoubleStream>(mapper, spliterator);
       return new DoubleStreamSource(this, new Spliterators.AbstractDoubleSpliterator(Long.MAX_VALUE, 0) {
         DoubleStream nextStream;
         Spliterator.OfDouble next;
