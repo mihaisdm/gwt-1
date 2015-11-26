@@ -195,19 +195,19 @@ public interface DoubleStream extends BaseStream<Double,DoubleStream> {
     @Override
     public <U> Stream<U> mapToObj(DoubleFunction<? extends U> mapper) {
       throwIfTerminated();
-      return Stream.empty();
+      return new Stream.EmptyStreamSource<U>(this);
     }
 
     @Override
     public IntStream mapToInt(DoubleToIntFunction mapper) {
       throwIfTerminated();
-      return IntStream.empty();
+      return new IntStream.EmptyIntStreamSource(this);
     }
 
     @Override
     public LongStream mapToLong(DoubleToLongFunction mapper) {
       throwIfTerminated();
-      return LongStream.empty();
+      return new LongStream.EmptyLongStreamSource(this);
     }
 
     @Override
@@ -726,7 +726,7 @@ public interface DoubleStream extends BaseStream<Double,DoubleStream> {
     @Override
     public LongStream mapToLong(DoubleToLongFunction mapper) {
       throwIfTerminated();
-      return null;//TODO
+      return new LongStream.LongStreamSource(this, new MapToLongSpliterator(mapper, spliterator));
     }
 
     @Override
@@ -801,7 +801,8 @@ public interface DoubleStream extends BaseStream<Double,DoubleStream> {
             innerAction.accept(item);
           });
         }
-      });    }
+      });
+    }
 
     @Override
     public DoubleStream limit(long maxSize) {

@@ -23,7 +23,7 @@ public final class StreamSupport {
   }
 
   public static LongStream longStream(Spliterator.OfLong spliterator, boolean parallel) {
-    return null;//TODO
+    return new LongStream.LongStreamSource(null, spliterator);
   }
 
   public static LongStream longStream(Supplier<? extends Spliterator.OfLong> supplier, int characteristics, final boolean parallel) {
