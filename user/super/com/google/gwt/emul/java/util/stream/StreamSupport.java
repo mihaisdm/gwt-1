@@ -15,7 +15,7 @@ public final class StreamSupport {
   }
 
   public static IntStream intStream(Spliterator.OfInt spliterator, boolean parallel) {
-    return null;//TODO
+    return new IntStream.IntStreamSource(null, spliterator);
   }
 
   public static IntStream intStream(Supplier<? extends Spliterator.OfInt> supplier, int characteristics, boolean parallel) {
