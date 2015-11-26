@@ -206,19 +206,19 @@ public interface IntStream extends BaseStream<Integer,IntStream> {
     @Override
     public <U> Stream<U> mapToObj(IntFunction<? extends U> mapper) {
       throwIfTerminated();
-      return Stream.empty();
+      return new Stream.EmptyStreamSource<U>(this);
     }
 
     @Override
     public LongStream mapToLong(IntToLongFunction mapper) {
       throwIfTerminated();
-      return LongStream.empty();
+      return new LongStream.EmptyLongStreamSource(this);
     }
 
     @Override
     public DoubleStream mapToDouble(IntToDoubleFunction mapper) {
       throwIfTerminated();
-      return DoubleStream.empty();
+      return new DoubleStream.EmptyDoubleStreamSource(this);
     }
 
     @Override
@@ -361,13 +361,13 @@ public interface IntStream extends BaseStream<Integer,IntStream> {
     @Override
     public LongStream asLongStream() {
       throwIfTerminated();
-      return LongStream.empty();
+      return new LongStream.EmptyLongStreamSource(this);
     }
 
     @Override
     public DoubleStream asDoubleStream() {
       throwIfTerminated();
-      return DoubleStream.empty();
+      return new DoubleStream.EmptyDoubleStreamSource(this);
     }
 
     @Override
@@ -738,7 +738,7 @@ public interface IntStream extends BaseStream<Integer,IntStream> {
     @Override
     public LongStream mapToLong(IntToLongFunction mapper) {
       throwIfTerminated();
-      return null;//TODO
+      return new LongStream.LongStreamSource(this, new MapToLongSpliterator(mapper, spliterator));
     }
 
     @Override

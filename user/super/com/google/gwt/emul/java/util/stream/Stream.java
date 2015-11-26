@@ -205,13 +205,13 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
       throwIfTerminated();
-      return null;//new LongStream.EmptyStreamSource();//TODO
+      return new LongStream.EmptyLongStreamSource(this);
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
       throwIfTerminated();
-      return null;//new DoubleStream.EmptyStreamSource();//TODO
+      return new DoubleStream.EmptyDoubleStreamSource(this);
     }
 
     @Override
@@ -223,19 +223,19 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
       throwIfTerminated();
-      return null;//new IntStream.EmptyStreamSource();//TODO
+      return new IntStream.EmptyIntStreamSource(this);
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
       throwIfTerminated();
-      return null;//new LongStream.EmptyStreamSource();//TODO
+      return new LongStream.EmptyLongStreamSource(this);
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
       throwIfTerminated();
-      return null;//new DoubleStream.EmptyStreamSource();//TODO
+      return new DoubleStream.EmptyDoubleStreamSource(this);
     }
 
     @Override
@@ -709,19 +709,19 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
       throwIfTerminated();
-      return StreamSupport.intStream(new MapToIntSpliterator<T>(mapper, spliterator), false);
+      return new IntStream.IntStreamSource(this, new MapToIntSpliterator<T>(mapper, spliterator));
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
       throwIfTerminated();
-      return StreamSupport.longStream(new MapToLongSpliterator<T>(mapper, spliterator), false);
+      return new LongStream.LongStreamSource(this, new MapToLongSpliterator<T>(mapper, spliterator));
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
       throwIfTerminated();
-      return StreamSupport.doubleStream(new MapToDoubleSpliterator<T>(mapper, spliterator), false);
+      return new DoubleStream.DoubleStreamSource(this, new MapToDoubleSpliterator<T>(mapper, spliterator));
     }
 
     @Override
@@ -863,7 +863,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public Stream<T> onClose(Runnable closeHandler) {
       throwIfTerminated();
-      return null;//TODO
+      return this;//TODO
     }
 
     @Override
