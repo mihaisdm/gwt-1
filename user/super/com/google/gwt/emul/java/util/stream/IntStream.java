@@ -750,7 +750,7 @@ public interface IntStream extends BaseStream<Integer,IntStream> {
     @Override
     public IntStream flatMap(IntFunction<? extends IntStream> mapper) {
       throwIfTerminated();
-      final Spliterator<? extends IntStream> spliteratorOfStreams = mapToObj(mapper).spliterator();
+      final Spliterator<? extends IntStream> spliteratorOfStreams = new MapToObjSpliterator<>(mapper, spliterator);
       return new IntStreamSource(this, new Spliterators.AbstractIntSpliterator(Long.MAX_VALUE, 0) {
         IntStream nextStream;
         Spliterator.OfInt next;

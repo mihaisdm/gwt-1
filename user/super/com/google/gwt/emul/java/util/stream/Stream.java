@@ -727,7 +727,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public <R> Stream<R> flatMap(final Function<? super T, ? extends Stream<? extends R>> mapper) {
       throwIfTerminated();
-      final Spliterator<? extends Stream<? extends R>> spliteratorOfStreams = map(mapper).spliterator();
+      final Spliterator<? extends Stream<? extends R>> spliteratorOfStreams = new MapToObjSpliterator<>(mapper, spliterator);
       return new StreamSource<R>(this, new Spliterators.AbstractSpliterator<R>(Long.MAX_VALUE, 0) {
         Stream<? extends R> nextStream;
         Spliterator<? extends R> next;
@@ -763,19 +763,109 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
       throwIfTerminated();
-      return null;//TODO
+      final Spliterator<? extends IntStream> spliteratorOfStreams = new MapToObjSpliterator<>(mapper, spliterator);
+      return new IntStream.IntStreamSource(this, new Spliterators.AbstractIntSpliterator(Long.MAX_VALUE, 0) {
+        IntStream nextStream;
+        Spliterator.OfInt next;
+        @Override
+        public boolean tryAdvance(IntConsumer action) {
+          while (advanceToNextSpliterator()) {//look for a new spliterator
+            if (next.tryAdvance(action)) {//if we have one, try to read and use it
+              return true;
+            } else {
+              nextStream.close();
+              nextStream = null;
+              next = null;//failed, null it out so we can find another
+            }
+          }
+          return false;
+        }
+        private boolean advanceToNextSpliterator() {
+          while (next == null) {
+            if (!spliteratorOfStreams.tryAdvance(n -> {
+              if (n != null) {
+                nextStream = n;
+                next = n.spliterator();
+              }
+            })) {
+              return false;
+            }
+          }
+          return true;
+        }
+      });
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
       throwIfTerminated();
-      return null;//TODO
+      final Spliterator<? extends LongStream> spliteratorOfStreams = new MapToObjSpliterator<>(mapper, spliterator);
+      return new LongStream.LongStreamSource(this, new Spliterators.AbstractLongSpliterator(Long.MAX_VALUE, 0) {
+        LongStream nextStream;
+        Spliterator.OfLong next;
+        @Override
+        public boolean tryAdvance(LongConsumer action) {
+          while (advanceToNextSpliterator()) {//look for a new spliterator
+            if (next.tryAdvance(action)) {//if we have one, try to read and use it
+              return true;
+            } else {
+              nextStream.close();
+              nextStream = null;
+              next = null;//failed, null it out so we can find another
+            }
+          }
+          return false;
+        }
+        private boolean advanceToNextSpliterator() {
+          while (next == null) {
+            if (!spliteratorOfStreams.tryAdvance(n -> {
+              if (n != null) {
+                nextStream = n;
+                next = n.spliterator();
+              }
+            })) {
+              return false;
+            }
+          }
+          return true;
+        }
+      });
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
       throwIfTerminated();
-      return null;//TODO
+      final Spliterator<? extends DoubleStream> spliteratorOfStreams = new MapToObjSpliterator<>(mapper, spliterator);
+      return new DoubleStream.DoubleStreamSource(this, new Spliterators.AbstractDoubleSpliterator(Long.MAX_VALUE, 0) {
+        DoubleStream nextStream;
+        Spliterator.OfDouble next;
+        @Override
+        public boolean tryAdvance(DoubleConsumer action) {
+          while (advanceToNextSpliterator()) {//look for a new spliterator
+            if (next.tryAdvance(action)) {//if we have one, try to read and use it
+              return true;
+            } else {
+              nextStream.close();
+              nextStream = null;
+              next = null;//failed, null it out so we can find another
+            }
+          }
+          return false;
+        }
+        private boolean advanceToNextSpliterator() {
+          while (next == null) {
+            if (!spliteratorOfStreams.tryAdvance(n -> {
+              if (n != null) {
+                nextStream = n;
+                next = n.spliterator();
+              }
+            })) {
+              return false;
+            }
+          }
+          return true;
+        }
+      });
     }
 
     @Override

@@ -746,13 +746,13 @@ public interface LongStream extends BaseStream<Long,LongStream> {
     @Override
     public DoubleStream mapToDouble(LongToDoubleFunction mapper) {
       throwIfTerminated();
-      return new DoubleStreamSource(this, new MapToDoubleSpliterator(mapper, spliterator));
+      return new DoubleStream.DoubleStreamSource(this, new MapToDoubleSpliterator(mapper, spliterator));
     }
 
     @Override
     public LongStream flatMap(LongFunction<? extends LongStream> mapper) {
       throwIfTerminated();
-      final Spliterator<? extends LongStream> spliteratorOfStreams = mapToObj(mapper).spliterator();
+      final Spliterator<? extends LongStream> spliteratorOfStreams = new MapToObjSpliterator<>(mapper, spliterator);
       return new LongStreamSource(this, new Spliterators.AbstractLongSpliterator(Long.MAX_VALUE, 0) {
         LongStream nextStream;
         Spliterator.OfLong next;
