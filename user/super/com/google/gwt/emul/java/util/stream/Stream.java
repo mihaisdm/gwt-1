@@ -683,6 +683,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
       return Optional.of(reduce(consumer.value, accumulator));
     }
 
+    //combiner is ignored, since we don't parallelize
     @Override
     public <U> U reduce(U identity, final BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
       terminate();
