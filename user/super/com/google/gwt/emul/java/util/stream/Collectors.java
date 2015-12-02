@@ -76,7 +76,7 @@ public final class Collectors {
   }
 
   public static <T> Collector<T,?,Long> counting() {
-    return reducing((Long) 0, item -> (Long) 1, (left, right) -> left + right);
+    return reducing((long) 0, item -> (long) 1, (left, right) -> left + right);
   }
 
   public static <T,K> Collector<T,?,Map<K,List<T>>> groupingBy(Function<? super T,? extends K> classifier) {
@@ -109,17 +109,19 @@ public final class Collectors {
         StringBuilder::new,
         (builder, string) -> builder.append(delimiter).append(string),
         (b1, b2) -> b1.append(delimiter).append(b2),
-        builder -> prefix + builder + suffix
+        builder -> prefix + builder.toString() + suffix
     );
   }
 
   public static <T,U,A,R> Collector<T,?,R> mapping(final Function<? super T,? extends U> mapper, final Collector<? super U,A,R> downstream) {
-    return Collector.<T, ?, R>of(
-        downstream.supplier(),
-        (a, t) -> downstream.accumulator().accept(a, mapper.apply(t)),
-        downstream.combiner(),
-        downstream.finisher(),
-        downstream.characteristics()
+    return Collector.<T, A, R>of(
+      downstream.supplier(),
+      (BiConsumer<A, T>) (A a, T t) -> {
+        downstream.accumulator().accept(a, mapper.apply(t));
+      },
+      downstream.combiner(),
+      downstream.finisher(),
+      downstream.characteristics().toArray(new Collector.Characteristics[downstream.characteristics().size()])
     );
   }
 
@@ -156,16 +158,16 @@ public final class Collectors {
   }
 
   public static <T,U> Collector<T,?,U> reducing(final U identity, final Function<? super T,? extends U> mapper, BinaryOperator<U> op) {
-    return Collector.<T, U[], U>of(
-        () -> new U[]{identity},
-        new BiConsumer<U[], T>() {
-          @Override
-          public void accept(U[] u, T t) {
-            u[0] = op.apply(u[0], mapper.apply(t));
-          }
-        },
-        (u1, u2) -> new u[]{op.apply(u1[0], u2[0])},
-        a -> a[0]
+    return Collector.<T, Object[], U>of(
+      () -> new Object[]{identity},
+      new BiConsumer<Object[], T>() {
+        @Override
+        public void accept(Object[] u, T t) {
+          u[0] = op.apply((U) u[0], mapper.apply(t));
+        }
+      },
+      (Object[] u1, Object[] u2) -> new Object[]{op.apply((U) u1[0], (U) u2[0])},
+      (Object[] a) -> (U) a[0]
     );
   }
 

@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 public final class StreamSupport {
 
   public static DoubleStream doubleStream(Spliterator.OfDouble spliterator, boolean parallel) {
-    return new DoubleStream.DoubleStreamSupport(null, spliterator);
+    return new DoubleStream.DoubleStreamSource(null, spliterator);
   }
 
   public static DoubleStream doubleStream(Supplier<? extends Spliterator.OfDouble> supplier, int characteristics, boolean parallel) {
