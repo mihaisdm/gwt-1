@@ -603,11 +603,10 @@ public interface IntStream extends BaseStream<Integer,IntStream> {
 
     @Override
     public IntSummaryStatistics summaryStatistics() {
-      terminate();
       return collect(
-          IntSummaryStatistics::new,
-          IntSummaryStatistics::accept,
-          IntSummaryStatistics::combine
+          () -> new IntSummaryStatistics(),
+          (stats, value) -> stats.accept(value),
+          (stats1, stats2) -> stats1.combine(stats2)
       );
     }
 
@@ -698,7 +697,7 @@ public interface IntStream extends BaseStream<Integer,IntStream> {
       terminate();
       int[] entries = new int[0];
       //this is legal in js, since the array will be backed by a JS array
-      forEachOrdered((int value) -> entries[entries.length] = value);
+      spliterator.forEachRemaining((int value) -> entries[entries.length] = value);
 
       return entries;
     }
