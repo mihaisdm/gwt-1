@@ -669,9 +669,9 @@ public interface LongStream extends BaseStream<Long,LongStream> {
     public LongSummaryStatistics summaryStatistics() {
       terminate();
       return collect(
-          LongSummaryStatistics::new,
-          LongSummaryStatistics::accept,
-          LongSummaryStatistics::combine
+          () -> new LongSummaryStatistics(),
+          (stats, value) -> stats.accept(value),
+          (stats1, stats2) -> stats1.combine(stats2)
       );
     }
 

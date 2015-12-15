@@ -643,9 +643,9 @@ public interface DoubleStream extends BaseStream<Double,DoubleStream> {
     public DoubleSummaryStatistics summaryStatistics() {
       terminate();
       return collect(
-          DoubleSummaryStatistics::new,
-          DoubleSummaryStatistics::accept,
-          DoubleSummaryStatistics::combine
+          () -> new DoubleSummaryStatistics(),
+          (stats, value) -> stats.accept(value),
+          (stats1, stats2) -> stats1.combine(stats2)
       );
     }
 
