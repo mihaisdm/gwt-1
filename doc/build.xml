@@ -32,7 +32,6 @@
   </path>
 
   <path id="DOC_PATH">
-    <pathelement location="./src" />
     <pathelement location="${gwt.build.lib}/gwt-doctool.jar" />
     <path path="${java.tools.path}" />
     <path refid="USER_SOURCE_PATH" />
@@ -42,7 +41,6 @@
   <target name="javadoc">
     <outofdate>
       <sourcefiles>
-        <fileset file="./src/gwt-user.html" />
         <fileset dir="${gwt.root}/user/src">
           <include name="**/*.java" />
         </fileset>
