@@ -27,6 +27,192 @@ import jsinterop.annotations.JsType;
 @JsType
 public interface Set<E> extends Collection<E> {
   @JsIgnore
+  static <E> Set<E> of() {
+    return Collections.emptySet();
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(E e1) {
+    return Collections.singleton(e1);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    set.add(e4);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    set.add(e4);
+    set.add(e5);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    set.add(e4);
+    set.add(e5);
+    set.add(e6);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    set.add(e4);
+    set.add(e5);
+    set.add(e6);
+    set.add(e7);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7,
+      E e8
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    set.add(e4);
+    set.add(e5);
+    set.add(e6);
+    set.add(e7);
+    set.add(e8);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7,
+      E e8,
+      E e9
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    set.add(e4);
+    set.add(e5);
+    set.add(e6);
+    set.add(e7);
+    set.add(e8);
+    set.add(e9);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7,
+      E e8,
+      E e9,
+      E e10
+  ) {
+    Set<E> set = new HashSet<E>(2);
+    set.add(e1);
+    set.add(e2);
+    set.add(e3);
+    set.add(e4);
+    set.add(e5);
+    set.add(e6);
+    set.add(e7);
+    set.add(e8);
+    set.add(e9);
+    set.add(e10);
+    return Collections.unmodifiableSet(set);
+  }
+
+  @JsIgnore
+  static <E> Set<E> of(E... elements) {
+    return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(elements)));
+  }
+
+  @JsIgnore
   @Override
   default Spliterator<E> spliterator() {
     return Spliterators.spliterator(this, Spliterator.DISTINCT);

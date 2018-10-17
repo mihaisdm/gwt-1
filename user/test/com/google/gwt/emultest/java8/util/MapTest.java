@@ -93,4 +93,16 @@ public class MapTest extends AbstractJava8MapTest {
       return container.entrySet();
     }
   }
+
+  public void testOf() {
+
+  }
+
+  public void testEntry() {
+
+  }
+
+  public void testOfEntries() {
+
+  }
 }

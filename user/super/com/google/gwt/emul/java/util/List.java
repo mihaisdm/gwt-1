@@ -34,6 +34,192 @@ import jsinterop.annotations.JsType;
 @JsType
 public interface List<E> extends Collection<E> {
 
+  @JsIgnore
+  static <E> List<E> of() {
+    return Collections.emptyList();
+  }
+
+  @JsIgnore
+  static <E> List<E> of(E e1) {
+    return Collections.singletonList(e1);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2
+  ) {
+    List<E> list = new ArrayList<>(2);
+    list.add(e1);
+    list.add(e2);
+    return Collections.unmodifiableList(list);
+  }
+  
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3
+  ) {
+    List<E> list = new ArrayList<>(3);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4
+  ) {
+    List<E> list = new ArrayList<>(4);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    list.add(e4);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5
+  ) {
+    List<E> list = new ArrayList<>(5);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    list.add(e4);
+    list.add(e5);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6
+  ) {
+    List<E> list = new ArrayList<>(6);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    list.add(e4);
+    list.add(e5);
+    list.add(e6);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7
+  ) {
+    List<E> list = new ArrayList<>(7);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    list.add(e4);
+    list.add(e5);
+    list.add(e6);
+    list.add(e7);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7,
+      E e8
+  ) {
+    List<E> list = new ArrayList<>(8);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    list.add(e4);
+    list.add(e5);
+    list.add(e6);
+    list.add(e7);
+    list.add(e8);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7,
+      E e8,
+      E e9
+  ) {
+    List<E> list = new ArrayList<>(9);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    list.add(e4);
+    list.add(e5);
+    list.add(e6);
+    list.add(e7);
+    list.add(e8);
+    list.add(e9);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(
+      E e1,
+      E e2,
+      E e3,
+      E e4,
+      E e5,
+      E e6,
+      E e7,
+      E e8,
+      E e9,
+      E e10
+  ) {
+    List<E> list = new ArrayList<>(10);
+    list.add(e1);
+    list.add(e2);
+    list.add(e3);
+    list.add(e4);
+    list.add(e5);
+    list.add(e6);
+    list.add(e7);
+    list.add(e8);
+    list.add(e9);
+    list.add(e10);
+    return Collections.unmodifiableList(list);
+  }
+
+  @JsIgnore
+  static <E> List<E> of(E... elements) {
+    return Collections.unmodifiableList(new ArrayList<>(Arrays.asList(elements)));
+  }
+
   @JsMethod(name = "addAtIndex")
   void add(int index, E element);
 

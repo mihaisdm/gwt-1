@@ -39,6 +39,7 @@ import com.google.gwt.emultest.java8.util.OptionalIntTest;
 import com.google.gwt.emultest.java8.util.OptionalLongTest;
 import com.google.gwt.emultest.java8.util.OptionalTest;
 import com.google.gwt.emultest.java8.util.PrimitiveIteratorTest;
+import com.google.gwt.emultest.java8.util.SetTest;
 import com.google.gwt.emultest.java8.util.SpliteratorsTest;
 import com.google.gwt.emultest.java8.util.StringJoinerTest;
 import com.google.gwt.emultest.java8.util.TreeMapTest;
@@ -85,6 +86,7 @@ import org.junit.runners.Suite.SuiteClasses;
   OptionalLongTest.class,
   OptionalDoubleTest.class,
   PrimitiveIteratorTest.class,
+  SetTest.class,
   SpliteratorsTest.class,
   StringJoinerTest.class,
   DoubleSummaryStatisticsTest.class,
