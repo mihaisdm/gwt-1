@@ -50,7 +50,17 @@ public class ListTest extends EmulTestBase {
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"
     );
 
-    // TODO verify NPE if any element is null
+    // ensure that NPE is thrown if a value is null
+    assertNPE("of", () -> List.of(null));
+    assertNPE("of", () -> List.of("a", null));
+    assertNPE("of", () -> List.of("a", "b", null));
+    assertNPE("of", () -> List.of("a", "b", "c", null));
+    assertNPE("of", () -> List.of("a", "b", "c", "d", null));
+    assertNPE("of", () -> List.of("a", "b", "c", "d", "e", null));
+    assertNPE("of", () -> List.of("a", "b", "c", "d", "e", "f", null));
+    assertNPE("of", () -> List.of("a", "b", "c", "d", "e", "f", "g", "h", null));
+    assertNPE("of", () -> List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", null));
+    assertNPE("of", () -> List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", null));
   }
   protected static void assertIsImmutableListOf(List<String> list, String... contents) {
     assertEquals(contents, list);
@@ -100,6 +110,15 @@ public class ListTest extends EmulTestBase {
       } catch (UnsupportedOperationException ignored) {
         // success
       }
+    }
+  }
+
+  protected void assertNPE(String methodName, Runnable runnable) {
+    try {
+      runnable.run();
+      fail("Expected NPE from calling " + methodName);
+    } catch (NullPointerException ignored) {
+      // expected
     }
   }
 }

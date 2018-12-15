@@ -41,7 +41,7 @@ public interface List<E> extends Collection<E> {
 
   @JsIgnore
   static <E> List<E> of(E e1) {
-    return Collections.singletonList(e1);
+    return Collections.singletonList(checkNotNull(e1));
   }
 
   @JsIgnore
@@ -50,8 +50,8 @@ public interface List<E> extends Collection<E> {
       E e2
   ) {
     List<E> list = new ArrayList<>(2);
-    list.add(e1);
-    list.add(e2);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
     return Collections.unmodifiableList(list);
   }
   
@@ -62,9 +62,9 @@ public interface List<E> extends Collection<E> {
       E e3
   ) {
     List<E> list = new ArrayList<>(3);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
     return Collections.unmodifiableList(list);
   }
 
@@ -76,10 +76,10 @@ public interface List<E> extends Collection<E> {
       E e4
   ) {
     List<E> list = new ArrayList<>(4);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
-    list.add(e4);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
+    list.add(checkNotNull(e4));
     return Collections.unmodifiableList(list);
   }
 
@@ -92,11 +92,11 @@ public interface List<E> extends Collection<E> {
       E e5
   ) {
     List<E> list = new ArrayList<>(5);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
-    list.add(e4);
-    list.add(e5);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
+    list.add(checkNotNull(e4));
+    list.add(checkNotNull(e5));
     return Collections.unmodifiableList(list);
   }
 
@@ -110,12 +110,12 @@ public interface List<E> extends Collection<E> {
       E e6
   ) {
     List<E> list = new ArrayList<>(6);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
-    list.add(e4);
-    list.add(e5);
-    list.add(e6);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
+    list.add(checkNotNull(e4));
+    list.add(checkNotNull(e5));
+    list.add(checkNotNull(e6));
     return Collections.unmodifiableList(list);
   }
 
@@ -130,13 +130,13 @@ public interface List<E> extends Collection<E> {
       E e7
   ) {
     List<E> list = new ArrayList<>(7);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
-    list.add(e4);
-    list.add(e5);
-    list.add(e6);
-    list.add(e7);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
+    list.add(checkNotNull(e4));
+    list.add(checkNotNull(e5));
+    list.add(checkNotNull(e6));
+    list.add(checkNotNull(e7));
     return Collections.unmodifiableList(list);
   }
 
@@ -152,14 +152,14 @@ public interface List<E> extends Collection<E> {
       E e8
   ) {
     List<E> list = new ArrayList<>(8);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
-    list.add(e4);
-    list.add(e5);
-    list.add(e6);
-    list.add(e7);
-    list.add(e8);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
+    list.add(checkNotNull(e4));
+    list.add(checkNotNull(e5));
+    list.add(checkNotNull(e6));
+    list.add(checkNotNull(e7));
+    list.add(checkNotNull(e8));
     return Collections.unmodifiableList(list);
   }
 
@@ -176,15 +176,15 @@ public interface List<E> extends Collection<E> {
       E e9
   ) {
     List<E> list = new ArrayList<>(9);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
-    list.add(e4);
-    list.add(e5);
-    list.add(e6);
-    list.add(e7);
-    list.add(e8);
-    list.add(e9);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
+    list.add(checkNotNull(e4));
+    list.add(checkNotNull(e5));
+    list.add(checkNotNull(e6));
+    list.add(checkNotNull(e7));
+    list.add(checkNotNull(e8));
+    list.add(checkNotNull(e9));
     return Collections.unmodifiableList(list);
   }
 
@@ -202,21 +202,24 @@ public interface List<E> extends Collection<E> {
       E e10
   ) {
     List<E> list = new ArrayList<>(10);
-    list.add(e1);
-    list.add(e2);
-    list.add(e3);
-    list.add(e4);
-    list.add(e5);
-    list.add(e6);
-    list.add(e7);
-    list.add(e8);
-    list.add(e9);
-    list.add(e10);
+    list.add(checkNotNull(e1));
+    list.add(checkNotNull(e2));
+    list.add(checkNotNull(e3));
+    list.add(checkNotNull(e4));
+    list.add(checkNotNull(e5));
+    list.add(checkNotNull(e6));
+    list.add(checkNotNull(e7));
+    list.add(checkNotNull(e8));
+    list.add(checkNotNull(e9));
+    list.add(checkNotNull(e10));
     return Collections.unmodifiableList(list);
   }
 
   @JsIgnore
   static <E> List<E> of(E... elements) {
+    for (int i = 0; i < elements.length; i++) {
+      checkNotNull(elements[i]);
+    }
     return Collections.unmodifiableList(new ArrayList<>(Arrays.asList(elements)));
   }
 
