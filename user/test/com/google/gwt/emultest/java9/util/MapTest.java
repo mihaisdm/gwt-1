@@ -46,6 +46,8 @@ public class MapTest extends EmulTestBase {
         Map.of("a", 1, "b", 2, "c", 3, "d", 4, "e", 5, "f", 6, "g", 7, "h", 8, "i", 9, "j", 10),
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"
     );
+
+    // TODO verify NPE if any key or value is null, IAE if any keys collide
   }
 
   protected static void assertIsImmutableMapOf(Map<String, Integer> map, String... contents) {

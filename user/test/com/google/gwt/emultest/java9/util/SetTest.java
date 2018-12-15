@@ -49,6 +49,8 @@ public class SetTest extends EmulTestBase {
         Set.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"),
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"
     );
+
+    //TODO verify NPE if any elt is null, and IAE if dups
   }
 
   protected static void assertIsImmutableSetOf(Set<String> set, String... contents) {

@@ -49,6 +49,8 @@ public class ListTest extends EmulTestBase {
         List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"),
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"
     );
+
+    // TODO verify NPE if any element is null
   }
   protected static void assertIsImmutableListOf(List<String> list, String... contents) {
     assertEquals(contents, list);
