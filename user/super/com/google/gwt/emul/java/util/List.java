@@ -270,4 +270,9 @@ public interface List<E> extends Collection<E> {
   }
 
   @JsNonNull List<E> subList(int fromIndex, int toIndex);
+
+  static <E> List<E> copyOf​(Collection<? extends E> coll) {
+    // TODO if the given collection is immutable and has no nulls, return it
+    return coll.stream().collect(Collectors.toUnmodifiableList());
+  }
 }

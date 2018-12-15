@@ -48,7 +48,7 @@ public class MapTest extends EmulTestBase {
     );
   }
 
-  private static void assertIsImmutableMapOf(Map<String, Integer> map, String... contents) {
+  protected static void assertIsImmutableMapOf(Map<String, Integer> map, String... contents) {
 
     assertEquals(contents.length, map.size());
     for (int i = 0; i < contents.length; i++) {

@@ -51,7 +51,7 @@ public class SetTest extends EmulTestBase {
     );
   }
 
-  private static void assertIsImmutableSetOf(Set<String> set, String... contents) {
+  protected static void assertIsImmutableSetOf(Set<String> set, String... contents) {
 
     assertEquals(contents.length, set.size());
     for (int i = 0; i < contents.length; i++) {
