@@ -51,7 +51,30 @@ public class SetTest extends EmulTestBase {
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"
     );
 
-    //TODO verify NPE if any elt is null, and IAE if dups
+    // ensure NPE if any element is null
+    assertNPE("Set.of(1)", () -> Set.of((String) null));
+    assertNPE("Set.of(2)", () -> Set.of("a", null));
+    assertNPE("Set.of(3)", () -> Set.of("a", "b", null));
+    assertNPE("Set.of(4)", () -> Set.of("a", "b", "c", null));
+    assertNPE("Set.of(5)", () -> Set.of("a", "b", "c", "d", null));
+    assertNPE("Set.of(6)", () -> Set.of("a", "b", "c", "d", "e", null));
+    assertNPE("Set.of(7)", () -> Set.of("a", "b", "c", "d", "e", "f", null));
+    assertNPE("Set.of(8)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", null));
+    assertNPE("Set.of(9)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", "h", null));
+    assertNPE("Set.of(10)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", "h", "i", null));
+    assertNPE("Set.of(...)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", null));
+
+    // ensure IAE if any element is duplicated
+    assertIAE("Set.of(2)", () -> Set.of("a", "a"));
+    assertIAE("Set.of(3)", () -> Set.of("a", "b", "a"));
+    assertIAE("Set.of(4)", () -> Set.of("a", "b", "c", "a"));
+    assertIAE("Set.of(5)", () -> Set.of("a", "b", "c", "d", "a"));
+    assertIAE("Set.of(6)", () -> Set.of("a", "b", "c", "d", "e", "a"));
+    assertIAE("Set.of(7)", () -> Set.of("a", "b", "c", "d", "e", "f", "a"));
+    assertIAE("Set.of(8)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", "a"));
+    assertIAE("Set.of(9)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", "h", "a"));
+    assertIAE("Set.of(10)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "a"));
+    assertIAE("Set.of(...)", () -> Set.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "a"));
   }
 
   protected static void assertIsImmutableSetOf(Set<String> set, String... contents) {
@@ -113,5 +136,23 @@ public class SetTest extends EmulTestBase {
       }
     }
     fail("Failed to find '" + value + "' in " + Arrays.toString(contents));
+  }
+
+  public static void assertNPE(String methodName, Runnable runnable) {
+    try {
+      runnable.run();
+      fail("Expected NPE from calling " + methodName);
+    } catch (NullPointerException ignored) {
+      // expected
+    }
+  }
+
+  public static void assertIAE(String methodName, Runnable runnable) {
+    try {
+      runnable.run();
+      fail("Expected IAE from calling " + methodName);
+    } catch (IllegalArgumentException ignored) {
+      // expected
+    }
   }
 }

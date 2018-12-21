@@ -5,6 +5,8 @@ import com.google.gwt.emultest.java.util.EmulTestBase;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.google.gwt.emultest.java9.util.SetTest.assertNPE;
+
 public class ListTest extends EmulTestBase {
   public void testOf() {
     assertIsImmutableListOf(List.of());
@@ -113,12 +115,4 @@ public class ListTest extends EmulTestBase {
     }
   }
 
-  protected void assertNPE(String methodName, Runnable runnable) {
-    try {
-      runnable.run();
-      fail("Expected NPE from calling " + methodName);
-    } catch (NullPointerException ignored) {
-      // expected
-    }
-  }
 }

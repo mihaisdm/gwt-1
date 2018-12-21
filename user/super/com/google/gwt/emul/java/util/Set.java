@@ -18,6 +18,8 @@ package java.util;
 import static javaemul.internal.InternalPreconditions.checkArgument;
 import static javaemul.internal.InternalPreconditions.checkNotNull;
 
+import java.util.stream.Collectors;
+
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 
@@ -72,9 +74,9 @@ public interface Set<E> extends Collection<E> {
   ) {
     Set<E> set = new HashSet<E>(2);
     set.add(checkNotNull(e1));
-    checkArgument(set.add(checkNotNull(e2));
-    checkArgument(set.add(checkNotNull(e3));
-    checkArgument(set.add(checkNotNull(e4));
+    checkArgument(set.add(checkNotNull(e2)));
+    checkArgument(set.add(checkNotNull(e3)));
+    checkArgument(set.add(checkNotNull(e4)));
     return Collections.unmodifiableSet(set);
   }
 
@@ -88,10 +90,10 @@ public interface Set<E> extends Collection<E> {
   ) {
     Set<E> set = new HashSet<E>(2);
     set.add(checkNotNull(e1));
-    checkArgument(set.add(checkNotNull(e2));
-    checkArgument(set.add(checkNotNull(e3));
-    checkArgument(set.add(checkNotNull(e4));
-    checkArgument(set.add(checkNotNull(e5));
+    checkArgument(set.add(checkNotNull(e2)));
+    checkArgument(set.add(checkNotNull(e3)));
+    checkArgument(set.add(checkNotNull(e4)));
+    checkArgument(set.add(checkNotNull(e5)));
     return Collections.unmodifiableSet(set);
   }
 
@@ -106,11 +108,11 @@ public interface Set<E> extends Collection<E> {
   ) {
     Set<E> set = new HashSet<E>(2);
     set.add(checkNotNull(e1));
-    checkArgument(set.add(checkNotNull(e2));
-    checkArgument(set.add(checkNotNull(e3));
-    checkArgument(set.add(checkNotNull(e4));
-    checkArgument(set.add(checkNotNull(e5));
-    checkArgument(set.add(checkNotNull(e6));
+    checkArgument(set.add(checkNotNull(e2)));
+    checkArgument(set.add(checkNotNull(e3)));
+    checkArgument(set.add(checkNotNull(e4)));
+    checkArgument(set.add(checkNotNull(e5)));
+    checkArgument(set.add(checkNotNull(e6)));
     return Collections.unmodifiableSet(set);
   }
 
@@ -126,12 +128,12 @@ public interface Set<E> extends Collection<E> {
   ) {
     Set<E> set = new HashSet<E>(2);
     set.add(checkNotNull(e1));
-    checkArgument(set.add(checkNotNull(e2));
-    checkArgument(set.add(checkNotNull(e3));
-    checkArgument(set.add(checkNotNull(e4));
-    checkArgument(set.add(checkNotNull(e5));
-    checkArgument(set.add(checkNotNull(e6));
-    checkArgument(set.add(checkNotNull(e7));
+    checkArgument(set.add(checkNotNull(e2)));
+    checkArgument(set.add(checkNotNull(e3)));
+    checkArgument(set.add(checkNotNull(e4)));
+    checkArgument(set.add(checkNotNull(e5)));
+    checkArgument(set.add(checkNotNull(e6)));
+    checkArgument(set.add(checkNotNull(e7)));
     return Collections.unmodifiableSet(set);
   }
 
@@ -148,13 +150,13 @@ public interface Set<E> extends Collection<E> {
   ) {
     Set<E> set = new HashSet<E>(2);
     set.add(checkNotNull(e1));
-    checkArgument(set.add(checkNotNull(e2));
-    checkArgument(set.add(checkNotNull(e3));
-    checkArgument(set.add(checkNotNull(e4));
-    checkArgument(set.add(checkNotNull(e5));
-    checkArgument(set.add(checkNotNull(e6));
-    checkArgument(set.add(checkNotNull(e7));
-    checkArgument(set.add(checkNotNull(e8));
+    checkArgument(set.add(checkNotNull(e2)));
+    checkArgument(set.add(checkNotNull(e3)));
+    checkArgument(set.add(checkNotNull(e4)));
+    checkArgument(set.add(checkNotNull(e5)));
+    checkArgument(set.add(checkNotNull(e6)));
+    checkArgument(set.add(checkNotNull(e7)));
+    checkArgument(set.add(checkNotNull(e8)));
     return Collections.unmodifiableSet(set);
   }
 
@@ -172,14 +174,14 @@ public interface Set<E> extends Collection<E> {
   ) {
     Set<E> set = new HashSet<E>(2);
     set.add(checkNotNull(e1));
-    checkArgument(set.add(checkNotNull(e2));
-    checkArgument(set.add(checkNotNull(e3));
-    checkArgument(set.add(checkNotNull(e4));
-    checkArgument(set.add(checkNotNull(e5));
-    checkArgument(set.add(checkNotNull(e6));
-    checkArgument(set.add(checkNotNull(e7));
-    checkArgument(set.add(checkNotNull(e8));
-    checkArgument(set.add(checkNotNull(e9));
+    checkArgument(set.add(checkNotNull(e2)));
+    checkArgument(set.add(checkNotNull(e3)));
+    checkArgument(set.add(checkNotNull(e4)));
+    checkArgument(set.add(checkNotNull(e5)));
+    checkArgument(set.add(checkNotNull(e6)));
+    checkArgument(set.add(checkNotNull(e7)));
+    checkArgument(set.add(checkNotNull(e8)));
+    checkArgument(set.add(checkNotNull(e9)));
     return Collections.unmodifiableSet(set);
   }
 
@@ -198,15 +200,15 @@ public interface Set<E> extends Collection<E> {
   ) {
     Set<E> set = new HashSet<E>(2);
     set.add(checkNotNull(e1));
-    checkArgument(set.add(checkNotNull(e2));
-    checkArgument(set.add(checkNotNull(e3));
-    checkArgument(set.add(checkNotNull(e4));
-    checkArgument(set.add(checkNotNull(e5));
-    checkArgument(set.add(checkNotNull(e6));
-    checkArgument(set.add(checkNotNull(e7));
-    checkArgument(set.add(checkNotNull(e8));
-    checkArgument(set.add(checkNotNull(e9));
-    checkArgument(set.add(checkNotNull(e10));
+    checkArgument(set.add(checkNotNull(e2)));
+    checkArgument(set.add(checkNotNull(e3)));
+    checkArgument(set.add(checkNotNull(e4)));
+    checkArgument(set.add(checkNotNull(e5)));
+    checkArgument(set.add(checkNotNull(e6)));
+    checkArgument(set.add(checkNotNull(e7)));
+    checkArgument(set.add(checkNotNull(e8)));
+    checkArgument(set.add(checkNotNull(e9)));
+    checkArgument(set.add(checkNotNull(e10)));
     return Collections.unmodifiableSet(set);
   }
 
@@ -214,7 +216,7 @@ public interface Set<E> extends Collection<E> {
   static <E> Set<E> of(E... elements) {
     HashSet<E> set = new HashSet<>();
     for (int i = 0; i < elements.length; i++) {
-      checkArgument(set.add(checkNotNull(elements[i]));
+      checkArgument(set.add(checkNotNull(elements[i])));
     }
     return Collections.unmodifiableSet(set);
   }

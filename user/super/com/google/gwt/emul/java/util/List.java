@@ -18,6 +18,7 @@ package java.util;
 import static javaemul.internal.InternalPreconditions.checkNotNull;
 
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsMethod;
