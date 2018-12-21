@@ -227,7 +227,7 @@ public interface Map<K, V> {
   }
 
   @JsIgnore
-  static <K, V> Map<K, V> ofEntries​(Entry<? extends K,? extends V>... entries) {
+  static <K, V> Map<K, V> ofEntries(Entry<? extends K,? extends V>... entries) {
     Map<K, V> map = new HashMap<>(entries.length);
 
     for (int i = 0; i < entries.length; i++) {

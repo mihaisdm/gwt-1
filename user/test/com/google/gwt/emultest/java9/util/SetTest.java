@@ -2,6 +2,7 @@ package com.google.gwt.emultest.java9.util;
 
 import com.google.gwt.emultest.java.util.EmulTestBase;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -68,7 +69,9 @@ public class SetTest extends EmulTestBase {
     } else {
       Iterator<String> itr = set.iterator();
       assertTrue(itr.hasNext());
-      assertEquals(contents[0], itr.next());
+
+      assertContains(contents, itr.next());
+
       assertEquals(contents.length > 1, itr.hasNext());
     }
 
@@ -101,5 +104,14 @@ public class SetTest extends EmulTestBase {
         // success
       }
     }
+  }
+
+  private static void assertContains(String[] contents, String value) {
+    for (String item : contents) {
+      if (item.equals(value)) {
+        return;
+      }
+    }
+    fail("Failed to find '" + value + "' in " + Arrays.toString(contents));
   }
 }
