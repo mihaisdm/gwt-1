@@ -53,7 +53,7 @@ public class ListTest extends EmulTestBase {
     );
 
     // ensure that NPE is thrown if a value is null
-    assertNPE("of", () -> List.of(null));
+    assertNPE("of", () -> List.of((String) null));
     assertNPE("of", () -> List.of("a", null));
     assertNPE("of", () -> List.of("a", "b", null));
     assertNPE("of", () -> List.of("a", "b", "c", null));

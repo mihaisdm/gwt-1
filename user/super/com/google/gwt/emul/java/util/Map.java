@@ -237,7 +237,7 @@ public interface Map<K, V> {
       //  AbstractMap.SimpleImmutableEntry, or something more specialized?
       Entry<? extends K, ? extends V> entry = checkNotNull(entries[i]);
       checkArgument(map.put(checkNotNull(entry.getKey()), checkNotNull(entry.getValue())) == null,
-          "Duplicate key" + entry.getKey());
+          "Duplicate key " + entry.getKey());
     }
 
     return Collections.unmodifiableMap(map);
