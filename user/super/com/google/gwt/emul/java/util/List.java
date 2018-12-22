@@ -55,7 +55,7 @@ public interface List<E> extends Collection<E> {
     list.add(checkNotNull(e2));
     return Collections.unmodifiableList(list);
   }
-  
+
   @JsIgnore
   static <E> List<E> of(
       E e1,

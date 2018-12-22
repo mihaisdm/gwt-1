@@ -57,7 +57,7 @@ public interface Map<K, V> {
     checkArgument(map.put(checkNotNull(k2), checkNotNull(v2)) == null, "Duplicate key " + k2);
     return Collections.unmodifiableMap(map);
   }
-  
+
   @JsIgnore
   static <K, V> Map<K, V> of(
       K k1, V v1,
@@ -229,7 +229,7 @@ public interface Map<K, V> {
   }
 
   @JsIgnore
-  static <K, V> Map<K, V> ofEntries(Entry<? extends K,? extends V>... entries) {
+  static <K, V> Map<K, V> ofEntries(Entry<? extends K, ? extends V>... entries) {
     Map<K, V> map = new HashMap<>(entries.length);
 
     for (int i = 0; i < entries.length; i++) {
