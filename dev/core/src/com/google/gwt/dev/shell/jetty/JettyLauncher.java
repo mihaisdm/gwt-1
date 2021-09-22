@@ -353,6 +353,7 @@ public class JettyLauncher extends ServletContainerLauncher {
       private final ClasspathPattern systemClassesFromWebappFirst = new ClasspathPattern(new String[] {
           "-javax.servlet.",
           "-javax.el.",
+          "-javax.websocket.",
           "javax.",
       });
       private final ClasspathPattern allowedFromSystemClassLoader = new ClasspathPattern(new String[] {
@@ -438,7 +439,7 @@ public class JettyLauncher extends ServletContainerLauncher {
         // For system path, always prefer the outside world.
         // Note: bootstrap has already been searched, so javax. classes should be
         // tried from the webapp first (except for javax.servlet).
-        if (WebAppContextWithReload.this.isServerClass(name) && !systemClassesFromWebappFirst.match(name)) {
+        if (WebAppContextWithReload.this.isSystemClass(name) && !systemClassesFromWebappFirst.match(name)) {
           try {
             return systemClassLoader.loadClass(name);
           } catch (ClassNotFoundException e) {
@@ -458,7 +459,7 @@ public class JettyLauncher extends ServletContainerLauncher {
         String resourceName = name.replace('.', '/') + ".class";
         URL found = systemClassLoader.getResource(resourceName);
         if (found == null) {
-          return null;
+          throw new ClassNotFoundException(name);
         }
 
         // Special-case JDBCUnloader; it should always be loaded in the webapp classloader
